@@ -10,6 +10,16 @@ using UnityEngine.Networking;
 public class AssetBundleManager
 {
     /// <summary>
+    /// ホスト
+    /// </summary>
+    private static readonly string Host = "https://simple-social-game.s3.ap-northeast-3.amazonaws.com/";
+
+    /// <summary>
+    /// Manifest
+    /// </summary>
+    private AssetBundle Manifest = null;
+
+    /// <summary>
     /// AssetBundleの辞書
     /// </summary>
     private Dictionary<string, AssetBundle> BundleDic = new Dictionary<string, AssetBundle>();
@@ -18,16 +28,23 @@ public class AssetBundleManager
     /// ダウンロード
     /// </summary>
     /// <param name="Name">AssetBundleを識別するための名前</param>
-    /// <param name="Url">URL</param>
     /// <param name="OnSuccess">成功コールバック</param>
     /// <param name="OnFail">失敗コールバック</param>
-    public IEnumerator Download(string Name, string Url, Action<AssetBundle> OnSuccess, Action OnFail = null)
+    public IEnumerator Download(string Name, Action<AssetBundle> OnSuccess, Action OnFail = null)
     {
         if (BundleDic.ContainsKey(Name))
         {
             OnSuccess?.Invoke(BundleDic[Name]);
             yield break;
         }
+        if (Manifest == null)
+        {
+            // 依存関係解決の為、先にManifestを落とす
+            string ManifestUrl = Host + "Windows";
+            yield return DownloadFile(ManifestUrl, (Bundle) => Manifest = Bundle, OnFail);
+        }
+
+        string Url = Host + Name;
         yield return DownloadFile(Url, (Bundle) =>
         {
             BundleDic.Add(Name, Bundle);

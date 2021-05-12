@@ -33,12 +33,12 @@ public class SimpleImageDisplay : MonoBehaviour
         if (bIsDownloading) { yield break; }
 
         bIsDownloading = true;
-        yield return AssetBundleManager.Instance.Download("TexPack0001", "https://simple-social-game.s3.ap-northeast-3.amazonaws.com/Windows/texpack0001", (Bundle) =>
+        yield return AssetBundleManager.Instance.Download("texpack0001", (Bundle) =>
         {
             var Img = Bundle.LoadAsset<Sprite>("f001");
             TargetImage.sprite = Img;
             TargetImage.SetNativeSize();
-        });
+        }, () => Debug.Log("Download Failed."));
         bIsDownloading = false;
     }
 }
