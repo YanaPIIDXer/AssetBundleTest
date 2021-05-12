@@ -1,0 +1,2 @@
+# AssetBundleTest
+AssetBundleの実験用リポジトリ
