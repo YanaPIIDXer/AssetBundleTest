@@ -40,5 +40,16 @@ public class AssetBundleBuilder
                 importer.SetAssetBundleNameAndVariant(BundleName, "");
             }
         }
+
+        // AssetBundleのビルド
+        var TmpRootDir = "Bundles/";
+        var WindowsTmpDir = TmpRootDir + "Windows/";
+        if (!Directory.Exists(WindowsTmpDir))
+        {
+            Directory.CreateDirectory(WindowsTmpDir);
+        }
+        BuildPipeline.BuildAssetBundles(WindowsTmpDir, BuildAssetBundleOptions.None, BuildTarget.StandaloneWindows);
+
+        Debug.Log("AssetBundleのビルドが完了しました。");
     }
 }
