@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+/// <summary>
+/// AssetBundleビルドクラス
+/// </summary>
 public class AssetBundleBuilder
 {
     /// <summary>
