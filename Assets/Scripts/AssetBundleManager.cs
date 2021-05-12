@@ -28,6 +28,19 @@ public class AssetBundleManager
             OnSuccess?.Invoke(BundleDic[Name]);
             yield break;
         }
+        yield return DownloadFile(Url, (Bundle) =>
+        {
+            BundleDic.Add(Name, Bundle);
+            OnSuccess?.Invoke(Bundle);
+        }, OnFail);
+    }
+
+    /// <summary>
+    /// ファイルをダウンロード
+    /// </summary>
+    /// <param name="Url">URL</param>
+    private IEnumerator DownloadFile(string Url, Action<AssetBundle> OnSuccess, Action OnFail)
+    {
         using (var Request = UnityWebRequestAssetBundle.GetAssetBundle(Url))
         {
             yield return Request.SendWebRequest();
@@ -40,7 +53,6 @@ public class AssetBundleManager
 
             var Handle = Request.downloadHandler as DownloadHandlerAssetBundle;
             var Bundle = Handle.assetBundle;
-            BundleDic.Add(Name, Bundle);
             OnSuccess?.Invoke(Bundle);
         }
     }
