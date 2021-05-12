@@ -46,6 +46,12 @@ public class SimpleImageDisplay : MonoBehaviour
             }
 
             Debug.Log("AssetBundle Download Success.");
+
+            var Handle = Request.downloadHandler as DownloadHandlerAssetBundle;
+            var Bundle = Handle.assetBundle;
+            var Img = Bundle.LoadAsset<Sprite>("f001");
+            TargetImage.sprite = Img;
+            TargetImage.SetNativeSize();
         }
         bIsDownloading = false;
     }
