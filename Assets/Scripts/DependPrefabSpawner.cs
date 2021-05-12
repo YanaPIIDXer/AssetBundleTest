@@ -50,6 +50,10 @@ public class DependPrefabSpawner : MonoBehaviour
 
             var Handle = Request.downloadHandler as DownloadHandlerAssetBundle;
             var Bundle = Handle.assetBundle;
+            var Prefab = Bundle.LoadAsset<GameObject>("ImageObject");
+            var Obj = GameObject.Instantiate(Prefab);
+            Obj.transform.SetParent(CanvasTransform);
+            Obj.transform.localPosition = Vector3.zero;
         }
         bIsDownloading = false;
     }
