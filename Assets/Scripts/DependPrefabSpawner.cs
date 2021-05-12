@@ -34,27 +34,14 @@ public class DependPrefabSpawner : MonoBehaviour
     {
         if (bIsDownloading) { yield break; }
         bIsDownloading = true;
-        using (var Request = UnityWebRequestAssetBundle.GetAssetBundle("https://simple-social-game.s3.ap-northeast-3.amazonaws.com/prefabpack"))
+
+        yield return AssetBundleManager.Instance.Download("prefabpack", (Bundle) =>
         {
-            Debug.Log("AssetBundle Download Start.");
-            yield return Request.SendWebRequest();
-
-            if (Request.isHttpError || Request.isNetworkError)
-            {
-                Debug.LogError("AssetBundle Download Error.");
-                bIsDownloading = false;
-                yield break;
-            }
-
-            Debug.Log("AssetBundle Download Success.");
-
-            var Handle = Request.downloadHandler as DownloadHandlerAssetBundle;
-            var Bundle = Handle.assetBundle;
             var Prefab = Bundle.LoadAsset<GameObject>("ImageObject");
             var Obj = GameObject.Instantiate(Prefab);
             Obj.transform.SetParent(CanvasTransform);
             Obj.transform.localPosition = Vector3.zero;
-        }
+        }, () => Debug.Log("Download Failed."));
         bIsDownloading = false;
     }
 }

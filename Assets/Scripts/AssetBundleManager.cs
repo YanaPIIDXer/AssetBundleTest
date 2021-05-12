@@ -17,7 +17,7 @@ public class AssetBundleManager
     /// <summary>
     /// Manifest
     /// </summary>
-    private AssetBundle Manifest = null;
+    private AssetBundleManifest Manifest = null;
 
     /// <summary>
     /// AssetBundleの辞書
@@ -35,13 +35,30 @@ public class AssetBundleManager
         if (BundleDic.ContainsKey(Name))
         {
             OnSuccess?.Invoke(BundleDic[Name]);
+            BundleDic[Name].Unload(false);
             yield break;
         }
         if (Manifest == null)
         {
             // 依存関係解決の為、先にManifestを落とす
             string ManifestUrl = Host + "Windows";
-            yield return DownloadFile(ManifestUrl, (Bundle) => Manifest = Bundle, OnFail);
+            yield return DownloadFile(ManifestUrl, (Bundle) =>
+            {
+                Manifest = Bundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+                Bundle.Unload(false);
+            }, OnFail);
+        }
+
+        var Depends = Manifest.GetAllDependencies(Name);
+        List<AssetBundle> DependBundles = new List<AssetBundle>();
+        foreach (var Depend in Depends)
+        {
+            string DependUrl = Host + Depend;
+            yield return DownloadFile(DependUrl, (Bundle) =>
+            {
+                BundleDic.Add(Depend, Bundle);
+                DependBundles.Add(Bundle);
+            }, OnFail);
         }
 
         string Url = Host + Name;
@@ -49,7 +66,13 @@ public class AssetBundleManager
         {
             BundleDic.Add(Name, Bundle);
             OnSuccess?.Invoke(Bundle);
+            Bundle.Unload(false);
         }, OnFail);
+
+        foreach (var Bundle in DependBundles)
+        {
+            Bundle.Unload(false);
+        }
     }
 
     /// <summary>
