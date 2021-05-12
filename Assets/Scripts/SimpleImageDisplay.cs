@@ -33,26 +33,12 @@ public class SimpleImageDisplay : MonoBehaviour
         if (bIsDownloading) { yield break; }
 
         bIsDownloading = true;
-        using (var Request = UnityWebRequestAssetBundle.GetAssetBundle("https://simple-social-game.s3.ap-northeast-3.amazonaws.com/Windows/texpack0001"))
+        yield return AssetBundleManager.Instance.Download("TexPack0001", "https://simple-social-game.s3.ap-northeast-3.amazonaws.com/Windows/texpack0001", (Bundle) =>
         {
-            Debug.Log("AssetBundle Download Start.");
-            yield return Request.SendWebRequest();
-
-            if (Request.isHttpError || Request.isNetworkError)
-            {
-                Debug.LogError("AssetBundle Download Error.");
-                bIsDownloading = false;
-                yield break;
-            }
-
-            Debug.Log("AssetBundle Download Success.");
-
-            var Handle = Request.downloadHandler as DownloadHandlerAssetBundle;
-            var Bundle = Handle.assetBundle;
             var Img = Bundle.LoadAsset<Sprite>("f001");
             TargetImage.sprite = Img;
             TargetImage.SetNativeSize();
-        }
+        });
         bIsDownloading = false;
     }
 }
